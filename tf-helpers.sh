@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export TF_DATA_DIR=~/.tfdata
+export TF_DATA_DIR=/opt/selinux-training-tf/.tfdata
 export PRIVATE_KEY_LOCATION=~/.ssh/aws_priv
 
 get_tf_binary() {

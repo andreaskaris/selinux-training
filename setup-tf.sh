@@ -1,10 +1,12 @@
 #!/bin/bash
 
+set -eu
+
 DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source "${DIR}/tf-helpers.sh"
 
-CMD="${1}"
-INSTANCE_COUNT="${2}"
+CMD="${1:-0}"
+INSTANCE_COUNT="${2:-0}"
 
 if [ "${CMD}" == "apply" ]; then
     if ! [[ "${INSTANCE_COUNT}" =~ ^[1-9]$ ]]; then

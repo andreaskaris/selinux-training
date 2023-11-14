@@ -4,7 +4,7 @@
 # For variables: https://developer.hashicorp.com/terraform/language/values/variables
 
 terraform {
-  backend "local" { path = "~/.terraform.tfstate" }
+  backend "local" { path = "/opt/selinux-training-tf/.terraform.tfstate" }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
