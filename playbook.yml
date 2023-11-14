@@ -1,0 +1,25 @@
+---
+- name: Set up SELinux lab
+  hosts: virtual_machines
+
+  tasks:
+    - name: Create /etc/motd
+      ansible.builtin.template:
+        src: templates/motd.j2
+        dest: /etc/motd
+
+    - name: Copy tutorial binary
+      ansible.builtin.template:
+        src: files/tutorial.py
+        dest: /usr/bin/tutorial
+        mode: '0755'
+
+    - name: Create /opt/tutorial
+      ansible.builtin.file:
+        path: /opt/tutorial
+        state: directory
+
+    - name: Copy steps
+      ansible.builtin.copy:
+        src: files/steps
+        dest: /opt/tutorial

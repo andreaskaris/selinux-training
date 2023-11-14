@@ -19,10 +19,14 @@ if ! [ -f "${ANSIBLE_CFG}" ]; then
 [defaults]
 inventory=inventory
 
-become_user=root
 remote_user=ec2-user
 private_key_file=${PRIVATE_KEY_LOCATION}
 host_key_checking = False
+
+[privilege_escalation]
+become=True
+become_method=sudo
+become_user=root
 EOF
 fi
 

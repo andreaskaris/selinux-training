@@ -8,8 +8,12 @@ apply: # Install with TF (provide INSTANCE_COUNT=... to specify the number of in
 setup-ansible: # Configure ansible.
 	./setup-ansible.sh
 
+.PHONY: run-ansible
+run-ansible: # Run ansible playbook.
+	ansible-playbook playbook.yml
+
 .PHONY: all
-all: apply setup-ansible # Deploy and configure ansible.
+all: apply setup-ansible run-ansible # Deploy and configure ansible.
 
 .PHONY: destroy
 destroy: # Destroy environment.
