@@ -10,8 +10,13 @@ Usage:
   tutorial instructions
   tutorial previous
   tutorial next
+  tutorial step STEP
   tutorial validate
   tutorial help
+
+
+Arguments:
+  STEP          Number of step to skip to.
 
 Options:
   -h --help     Show this screen.
@@ -58,7 +63,16 @@ class Config:
 
     def get_step(self):
         """ get_step returns the current step """
+
         return self.cfg["step"]
+
+    def set_step(self, step):
+        """ set_step sets the current step """
+        if int(step) > self.max_steps - 1 or int(step) < 0:
+            raise ValueError(f"Invalid value for step: '{step}'. " +
+                             f"Must be in range 0 - {self.max_steps - 1}.")
+        self.cfg["step"] = int(step)
+        self.write()
 
     def is_first_step(self):
         """ is_first_step returns true if this is the first step """
@@ -111,15 +125,32 @@ class Step:
         return res.returncode == 0
 
 
+COLORS = {
+        'red': '\033[0;31m',
+        'green': '\033[0;32m',
+        'blue': '\033[0;34m',
+        'nocolor': '\033[0m'
+        }
+
+
+def printc(color, text, end="\n"):
+    """ printc prints color text to the console """
+    if color not in COLORS:
+        raise ValueError(f'Color {color} not in list of valid colors {COLORS}')
+    print(COLORS[color], end="")
+    print(text, end="")
+    print(COLORS['nocolor'], end=end)
+
+
 if __name__ == '__main__':
     try:
-        max_steps = len(os.listdir(STEPS_DIRECTORY))
+        maximum_steps = len(os.listdir(STEPS_DIRECTORY))
     except FileNotFoundError as e:
         print(f'File not found, err: {e}')
         sys.exit(1)
 
     try:
-        cfg = Config(PROGRESS_FILE, max_steps)
+        cfg = Config(PROGRESS_FILE, maximum_steps)
     except FileNotFoundError as e:
         print(f'File not found, err: {e}')
         sys.exit(1)
@@ -141,25 +172,41 @@ if __name__ == '__main__':
             sys.exit()
         cfg.previous_step()
         print(f"Now at step {cfg.get_step()}")
+        printc('blue', "Run `tutorial instructions` to get instructions.")
         sys.exit()
 
     if arguments['next']:
         if cfg.is_last_step():
-            print("Congratulations, you have reached the end of the tutorial.")
+            printc('blue',
+                   "Congratulations, you reached the end of the tutorial.")
             sys.exit()
         cfg.next_step()
         print(f"Now at step {cfg.get_step()}")
+        printc('blue', "Run `tutorial instructions` to get instructions.")
         sys.exit()
 
-    step = Step(STEPS_DIRECTORY, cfg.get_step())
+    if arguments['step']:
+        try:
+            cfg.set_step(arguments['STEP'])
+        except ValueError as e:
+            printc('red', e)
+            sys.exit(1)
+        print(f"Now at step {cfg.get_step()}")
+        printc('blue', "Run `tutorial instructions` to get instructions.")
+        sys.exit()
+
+    current_step = Step(STEPS_DIRECTORY, cfg.get_step())
     if arguments['validate']:
-        if step.validate():
-            print("All validation steps finished successfully.")
-            print("You may now run `tutorial next` to go to the next step.")
+        if current_step.validate():
+            printc('green', "All validation steps finished successfully.")
+            printc('green',
+                   "You may now run `tutorial next` to go to the next step.")
             sys.exit()
         else:
-            print("Validation steps failed.")
+            printc('red', "Validation steps failed.")
             sys.exit(1)
     if arguments['instructions']:
-        step.description()
+        printc('blue', f"Instructions for step {cfg.get_step()}:\n")
+        current_step.description()
+        printc('blue', "Run `tutorial validate` after completing these steps.")
         sys.exit()
