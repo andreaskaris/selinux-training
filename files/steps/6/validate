@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Checking that httpd is inactive"
+if [ "$(systemctl is-active httpd)" == "active" ]; then
+    echo "httpd is still running. Please stop it."
+    exit 1
+fi
+
+exit 0

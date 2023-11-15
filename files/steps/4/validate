@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Checking that SELinux is permanently disabled"
+if ! grep -q "selinux=0" /proc/cmdline; then
+    echo "SELinux is not permanently disabled"
+    exit 1
+fi
+
+exit 0

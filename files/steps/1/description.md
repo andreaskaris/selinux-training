@@ -8,6 +8,7 @@
    RHEL 9.
 
      getenforce
+     sestatus
 
 3. Run the service again:
 
@@ -23,4 +24,3 @@
      grep -i denied /var/log/audit/audit.log
 
    You will see the same SELinux violation, but this time it is not being enforced, it is only being reported.
-
