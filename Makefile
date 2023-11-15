@@ -4,6 +4,10 @@ INSTANCE_COUNT ?= 1
 apply: # Install with TF (provide INSTANCE_COUNT=... to specify the number of instances, default 1)
 	./setup-tf.sh apply $(INSTANCE_COUNT)
 
+.PHONY: block-egress
+block-egress: # Install with TF with egress blocked(provide INSTANCE_COUNT=... to specify the number of instances, default 1)
+	./setup-tf.sh block-egress $(INSTANCE_COUNT)
+
 .PHONY: setup-ansible
 setup-ansible: # Configure ansible.
 	./setup-ansible.sh
@@ -13,7 +17,7 @@ run-ansible: # Run ansible playbook.
 	ansible-playbook playbook.yml
 
 .PHONY: all
-all: apply setup-ansible run-ansible # Deploy and configure ansible.
+all: apply setup-ansible run-ansible block-egress # Deploy and configure ansible.
 
 .PHONY: destroy
 destroy: # Destroy environment.

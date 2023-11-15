@@ -1,0 +1,6 @@
+[Unit]
+Description=Cause SELinux violation
+
+[Service]
+Type=simple
+ExecStart=/opt/tutorial/bin/cause-violation

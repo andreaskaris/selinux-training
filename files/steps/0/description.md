@@ -1,30 +1,50 @@
 # Enabling / disabling SELinux temporarily
 
-1. Run `getenforce`.
+1. Run `getenforce`:
+
+     getenforce
 
    getenforce shows the current enforcement state. It is either of:
      Enforcing: SELinux enforces its policies.
      Permissive: SELinux reports violations, but does not enforce its policies.
      Disabled: SELinux is completely disabled.
 
-2. Run a script that makes a prohibited call:
+2. Run a systemd service that makes a prohibited call:
 
-   /usr/local/bin/cause-violation
+     systemctl start cause-violation
 
-   Observe the script's output. You should see the script failing.
+   Observe the service's status:
+
+     systemctl status cause-violation
+
+   You should see the service failing.
    Check if there are any SELinux violations with:
 
-   journalctl -t setroubleshoot
+     journalctl -t setroubleshoot
 
 3. Set SELinux into permissive mode with:
    
-   setenforce 0
+     setenforce 0
 
-4. Run the script again:
+4. Check the current state of SELinux. It is now in permissive mode. You cannot disable SELinux from user space in
+   RHEL 9.
 
-   /usr/local/bin/cause-violation
+     getenforce
 
-   Observe the script's output. What is happening now?
+5. Run the service again:
+
+     systemctl start cause-violation
+
+   Observe the service's status. What is happening now?
+
+     systemctl status cause-violation
+
    Check if there are any SELinux violations with:
 
-   journalctl -t setroubleshoot
+     journalctl -t setroubleshoot
+
+   You will see the same SELinux violation, but this time it is not being enforced, it is only being reported.
+
+6. Enforce SELinux again:
+
+     setenforce 1

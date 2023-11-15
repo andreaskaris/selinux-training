@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Checking if service cause-violation logged an SELinux exception"
+if ! journalctl -t setroubleshoot | grep -q -E 'SELinux.*/opt/tutorial/bin/cause-violation'; then
+    echo "Cannot find a security violation from service cause-violation"
+    exit 1
+fi
+
+echo "Checking that SELinux is in enforcing mode again"
+if [ "$(getenforce)" != "Enforcing" ]; then
+    echo "SELinux is not in enforcing mode, please set it back to enforcing"
+    exit 1
+fi
+
+exit 0

@@ -29,6 +29,11 @@ variable "instance_count" {
   }
 }
 
+variable "block_egress" {
+  type        = bool
+  description = "Decides if egress from instances should be allowed or not."
+}
+
 # Generate a new private key
 resource "tls_private_key" "example" {
   algorithm = "RSA"
@@ -45,26 +50,32 @@ resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH inbound traffic"
 
-  ingress {
-    description      = "Allow SSH inbound traffic"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-#  egress {
-#    from_port        = 0
-#    to_port          = 0
-#    protocol         = "-1"
-#    cidr_blocks      = ["0.0.0.0/0"]
-#    ipv6_cidr_blocks = ["::/0"]
-#  }
-
   tags = {
     Name = "allow_ssh"
   }
+}
+
+resource "aws_security_group_rule" "ssh_ingress" {
+  type              = "ingress"
+  description      = "Allow SSH inbound traffic"
+  from_port        = 22
+  to_port          = 22
+  protocol         = "tcp"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+  security_group_id = "${aws_security_group.allow_ssh.id}"
+}
+
+resource "aws_security_group_rule" "allow_all_outbound" {
+  count = (var.block_egress) ? 0 : 1
+  type              = "egress"
+  description      = "Allow all outbound"
+  from_port        = 0
+  to_port          = 0
+  protocol         = "-1"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+  security_group_id = "${aws_security_group.allow_ssh.id}"
 }
 
 resource "aws_instance" "selinux" {

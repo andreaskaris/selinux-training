@@ -3,10 +3,21 @@
   hosts: virtual_machines
 
   tasks:
-    - name: Create /etc/motd
-      ansible.builtin.template:
-        src: templates/motd.j2
-        dest: /etc/motd
+    - name: Install dependencies
+      ansible.builtin.dnf:
+        name:
+          - setools-console
+          - setroubleshoot-server
+          - httpd
+          - vim
+          - nmap-ncat
+          - python3.11
+          - python3.11-pip
+        state: present
+
+    - name: Install docopt
+      ansible.builtin.command:
+        cmd: pip3.11 install docopt
 
     - name: Copy tutorial binary
       ansible.builtin.template:
@@ -19,7 +30,34 @@
         path: /opt/tutorial
         state: directory
 
-    - name: Copy steps
+    - name: Copy tutorial steps
       ansible.builtin.copy:
         src: files/steps
         dest: /opt/tutorial
+        mode: preserve
+
+    - name: Copy tutorial bin
+      ansible.builtin.copy:
+        src: files/bin
+        dest: /opt/tutorial
+
+    - name: Set SEType of /opt/tutorial/bin/cause-violation
+      ansible.builtin.file:
+        path: /opt/tutorial/bin/cause-violation
+        state: file
+        setype: httpd_sys_content_t
+        mode: '0755'
+
+    - name: Create cause-violation.service
+      ansible.builtin.copy:
+        src: files/services/cause-violation.service
+        dest: /etc/systemd/system/cause-violation.service
+
+    - name: Reload systemd
+      ansible.builtin.command:
+        cmd: systemctl daemon-reload
+
+    - name: Create /etc/motd
+      ansible.builtin.template:
+        src: templates/motd.j2
+        dest: /etc/motd
