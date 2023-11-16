@@ -17,4 +17,5 @@
 
 5. After the reboot, query the boolean again - you will see that it switched back to off:
 
+     getsebool httpd_use_nfs
      semanage boolean -l | grep httpd_use_nfs

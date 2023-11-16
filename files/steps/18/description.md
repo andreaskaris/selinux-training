@@ -11,7 +11,7 @@ In the previous step, we ran sealert to analyze why SELinux denied httpd to run.
 
 2. In this case, sealert suggests with a confidence > 90 percent that you should run
    `semanage port -a -t PORT_TYPE -p tcp 3333`. It also suggests the values for PORT_TYPE,
-   amount which is `http_port_t`. List the values for `http_port_t`:
+   among which is `http_port_t`. List the values for `http_port_t`:
 
      semanage port -l | grep ^http_port_t
 
@@ -19,11 +19,16 @@ In the previous step, we ran sealert to analyze why SELinux denied httpd to run.
 
      semanage port -a -t http_port_t -p tcp 3333
 
-4. Restart httpd:
+4. List the values for `http_port_t` again:
+
+     semanage port -l | grep ^http_port_t
+
+5. Restart httpd:
 
      systemctl restart httpd
 
-5. Verify that httpd is running. Yet, you cannot retrieve your document from localhost:3333:
+6. Verify that httpd is running. Yet, you cannot retrieve your document from localhost:3333.
+   Instead, httpd presents the default Welcome page, meaning that it could not access index.html.
 
      systemctl status httpd
      curl http://localhost:3333

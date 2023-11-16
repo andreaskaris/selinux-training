@@ -14,9 +14,10 @@ Note: Contrary to RHEL 8, in RHEL 9 it is no longer possible to set SELinux=disa
 
 3. Wait for your system to reboot.
 
-4. Check the SELinux status:
+4. Check the SELinux status as well as /proc/cmdline:
 
      sestatus
+     cat /proc/cmdline
 
  5. Then, run the `cause-violation` service again:
 
@@ -25,4 +26,3 @@ Note: Contrary to RHEL 8, in RHEL 9 it is no longer possible to set SELinux=disa
 6. Check the journal and /var/log/audit/audit.log. SELinux is disabled, and nothing should be logged:
 
      journalctl -t setroubleshoot --boot
-     less /var/log/audit/audit.log

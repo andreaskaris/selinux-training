@@ -1,10 +1,10 @@
 #!/bin/env python3.11
 """SELinux tutorial
 
-You can show instructions with `tutorial instructions`.
-You can validate that you followed instructions with `tutorial validate`.
-You can go to the next step with `tutorial next`.
-You can go to a previous step with `tutorial previous`.
+Show instructions with `tutorial instructions` (alias i).
+Validate that you followed instructions with `tutorial validate` (alias v).
+Go to the next step with `tutorial next` (alias n).
+Go to a previous step with `tutorial previous` (alias p).
 
 Usage:
   tutorial instructions
@@ -142,19 +142,34 @@ def printc(color, text, end="\n"):
     print(COLORS['nocolor'], end=end)
 
 
+def printh(color, text):
+    """ printh prints a header """
+    printc(color, "************************************************")
+    printc(color, text)
+    printc(color, "************************************************")
+
+
+def print_instructions(config, step):
+    """ print_instructions prints instructions for the current step """
+    printh('blue', f"Instructions for step {config.get_step()}:")
+    step.description()
+    printh('blue', "Run `tutorial validate` or `v` for validation.")
+
+
 if __name__ == '__main__':
+    # Check if STEPS_DIRECTORY exists and open PROGRESS_FILE.
     try:
         maximum_steps = len(os.listdir(STEPS_DIRECTORY))
     except FileNotFoundError as e:
         print(f'File not found, err: {e}')
         sys.exit(1)
-
     try:
         cfg = Config(PROGRESS_FILE, maximum_steps)
     except FileNotFoundError as e:
         print(f'File not found, err: {e}')
         sys.exit(1)
 
+    # Parse command line options.
     arguments = []
     try:
         arguments = docopt(__doc__)
@@ -162,27 +177,29 @@ if __name__ == '__main__':
         print(__doc__, end="")
         sys.exit(1)
 
+    # Show help text.
     if arguments['help']:
         print(__doc__, end="")
         sys.exit()
 
+    # Act upon provided option.
     if arguments['previous']:
         if cfg.is_first_step():
             print("You are already at the first step.")
             sys.exit()
         cfg.previous_step()
-        print(f"Now at step {cfg.get_step()}")
-        printc('blue', "Run `tutorial instructions` to get instructions.")
+        current_step = Step(STEPS_DIRECTORY, cfg.get_step())
+        print_instructions(cfg, current_step)
         sys.exit()
 
     if arguments['next']:
         if cfg.is_last_step():
-            printc('blue',
+            printh('blue',
                    "Congratulations, you reached the end of the tutorial.")
             sys.exit()
         cfg.next_step()
-        print(f"Now at step {cfg.get_step()}")
-        printc('blue', "Run `tutorial instructions` to get instructions.")
+        current_step = Step(STEPS_DIRECTORY, cfg.get_step())
+        print_instructions(cfg, current_step)
         sys.exit()
 
     if arguments['step']:
@@ -191,22 +208,22 @@ if __name__ == '__main__':
         except ValueError as e:
             printc('red', e)
             sys.exit(1)
-        print(f"Now at step {cfg.get_step()}")
-        printc('blue', "Run `tutorial instructions` to get instructions.")
+        current_step = Step(STEPS_DIRECTORY, cfg.get_step())
+        print_instructions(cfg, current_step)
         sys.exit()
 
-    current_step = Step(STEPS_DIRECTORY, cfg.get_step())
     if arguments['validate']:
+        current_step = Step(STEPS_DIRECTORY, cfg.get_step())
         if current_step.validate():
-            printc('green', "All validation steps finished successfully.")
-            printc('green',
-                   "You may now run `tutorial next` to go to the next step.")
+            printh('green', "All validation steps finished successfully.\n" +
+                   "You may now run `tutorial next`  or `n` " +
+                   "to go to the next step.")
             sys.exit()
         else:
-            printc('red', "Validation steps failed.")
+            printh('red', "Validation steps failed.")
             sys.exit(1)
+
     if arguments['instructions']:
-        printc('blue', f"Instructions for step {cfg.get_step()}:\n")
-        current_step.description()
-        printc('blue', "Run `tutorial validate` after completing these steps.")
+        current_step = Step(STEPS_DIRECTORY, cfg.get_step())
+        print_instructions(cfg, current_step)
         sys.exit()

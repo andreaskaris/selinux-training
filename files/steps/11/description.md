@@ -13,7 +13,7 @@
      touch /test/b/c
 
 3. Let's pretend that we want to give our custom `/test` directory the same labels as `/etc`. Go ahead and search for
-   `/etc` in the fcontect database:
+   `/etc` in the fcontext database:
 
      semanage fcontext -l | grep '/etc' | grep etc_t
 
@@ -21,6 +21,14 @@
 
      semanage fcontext -a -t etc_t  '/test(/.*)?'
 
-5. Use `restorecon` to relabel all files and directories under /test:
+5. You can list all custom changes to fcontexts with:
+
+     semanage fcontext -C -l
+
+6. Use `restorecon` to relabel all files and directories under /test:
 
      restorecon -Rv /test
+
+7. And list the SELinux labels of /test/b/c:
+
+     ls -alZ /test/b/c

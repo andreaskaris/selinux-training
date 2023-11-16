@@ -12,5 +12,3 @@ However, if you want to permanently disable SELinux, in RHEL 9, it is no longer 
 
 If you had to switch SELinux from targeted mode to Multi-Level Security (MLS), you would do that with variable
 SELINUXTYPE in file /etc/selinux/config. This is out of scope of this tutorial.
-
-Go ahead to the next step now with `tutorial next`.

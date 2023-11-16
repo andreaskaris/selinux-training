@@ -2,7 +2,6 @@
 
 In order to enable SELinux permanently, you must remove `selinux=0` from the kernel command line and reboot your
 system (https://access.redhat.com/solutions/3176).
-Note: Contrary to RHEL 8, in RHEL 9 it is no longer possible to set SELinux=disabled in /etc/selinux/config.
 
 1. Enable SELinux permanently:
 
@@ -12,11 +11,15 @@ Note: Contrary to RHEL 8, in RHEL 9 it is no longer possible to set SELinux=disa
 
      reboot
 
-3. Wait for your system to reboot, then run the `cause-violation` service again:
+3. Wait for your system to reboot, then check `sestatus` and `/proc/cmdline` again:
+
+     sestatus
+     cat /proc/cmdline
+
+4. Run the `cause-violation` service again:
 
      systemctl start cause-violation
 
-4. Check the journal and /var/log/audit/audit.log. SELinux is enabled, and errors should be logged again:
+5. Check the journal and /var/log/audit/audit.log. SELinux is enabled, and errors should be logged again:
 
      journalctl -t setroubleshoot --boot
-     less /var/log/audit/audit.log
