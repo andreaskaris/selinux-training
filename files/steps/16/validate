@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Verifying that httpd is serving the correct content on port 3333"
+if ! [ "$(curl localhost:3333 2>/dev/null)" == "Listening on port 3333" ]; then
+    echo "Could not verify that httpd is serving the correct file on port 3333"
+    exit 1
+fi
+
+exit 0

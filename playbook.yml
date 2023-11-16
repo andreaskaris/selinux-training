@@ -61,3 +61,20 @@
       ansible.builtin.template:
         src: templates/motd.j2
         dest: /etc/motd
+
+    - name: Add PS1 line to bashrc
+      ansible.builtin.lineinfile:
+        path: /root/.bashrc
+        state: present
+        line: 'PS1="\033[0;35m[ CLI shortcuts: i: tutorial instructions. v: tutorial validate. n: tutorial next. p: tutorial previous]\033[0;0m\n$PS1"'
+
+    - name: Add aliases to bashrc
+      ansible.builtin.lineinfile:
+        path: /root/.bashrc
+        state: present
+        line: "{{item}}"
+      loop:
+        - "alias i='tutorial instructions'"
+        - "alias v='tutorial validate'"
+        - "alias n='tutorial next'"
+        - "alias p='tutorial previous'"

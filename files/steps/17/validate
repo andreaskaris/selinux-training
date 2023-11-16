@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Verifying that httpd is in failed state."
+if [ "$(systemctl is-failed httpd)" != "failed" ]; then
+    echo "httpd is not in failed state"
+    exit 1
+fi
+
+echo "Verifying that SELinux denies httpd to use port 3333"
+if ! grep -q -E 'avc:  denied.*httpd.*tcp_socket.*permissive=0' /var/log/audit/audit.log; then
+    echo "Could not find expected SELinux AVC denied message"
+    exit 1
+fi
+
+exit 0

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo "Verifying that httpd is in active state."
+if [ "$(systemctl is-active httpd)" != "active" ]; then
+    echo "httpd is not in active state"
+    exit 1
+fi
+
+echo "Verifying that httpd index.html cannot be accessed"
+if [ "$(curl localhost:3333 2>/dev/null)" == "Listening on port 3333" ]; then
+    echo "httpd is serving the correct document, but it should not"
+    exit 1
+fi
+
+echo "Verifying that SELinux denies httpd access to index.html"
+if ! grep -q -E 'avc:  denied.*httpd.*/port3333/index.html.*permissive=0' /var/log/audit/audit.log; then
+    echo "Could not find expected SELinux AVC denied message"
+    exit 1
+fi
+
+exit 0

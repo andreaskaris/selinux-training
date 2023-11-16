@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo "Verifying that httpd is in active state."
+if [ "$(systemctl is-active httpd)" != "active" ]; then
+    echo "httpd is not in active state"
+    exit 1
+fi
+
+echo "Verifying that httpd index.html can be accessed"
+if [ "$(curl localhost:3333 2>/dev/null)" != "Listening on port 3333" ]; then
+    echo "httpd is not serving the correct document"
+    exit 1
+fi
+
+echo "Verifying that /port3333 has the correct fcontext entry"
+if ! semanage fcontext -l | grep port3333 | grep -q httpd_sys_content_t; then
+    echo "Entry missing in fcontext"
+    exit 1
+fi
+
+echo "Verifying that /port3333/index.html has the correct label"
+if ! ls -alZ /port3333/index.html | grep -q httpd_sys_content_t; then
+    echo "Could not find expected SELinux label on /port3333/index.html"
+    exit 1
+fi
+
+exit 0
