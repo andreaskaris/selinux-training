@@ -1,23 +1,22 @@
-# Learning about file labels
+# Enabling SELinux permanently
 
-All files and processes in a RHEL 9 system have an SELinux label. Many commands such as `ps`, `ls` and `id` come with
-the `-Z` parameter to list SELinux labels.
+In order to enable SELinux permanently, you must remove `selinux=0` from the kernel command line and reboot your
+system (https://access.redhat.com/solutions/3176).
+Note: Contrary to RHEL 8, in RHEL 9 it is no longer possible to set SELinux=disabled in /etc/selinux/config.
 
-1. Go ahead and inspect different directories now:
+1. Enable SELinux permanently:
 
-     ls -alZ /etc/httpd
-     ls -alZ /var/www/html
+     grubby --update-kernel ALL --remove-args selinux
 
-2. Start httpd how:
+2. Reboot your system:
 
-     systemctl start httpd
+     reboot
 
-3. List the label that the httpd process runs with. Compare that to the label of the httpd binary.
-   The file is labeled with type `httpd_exec_t`. The process runs with type label `httpd_t`.
+3. Wait for your system to reboot, then run the `cause-violation` service again:
 
-     ps aux -Z | grep httpd
-     ls -alZ /usr/sbin/httpd
+     systemctl start cause-violation
 
-4. We will come back to httpd a bit later. For the time being, let's stop the service again:
+4. Check the journal and /var/log/audit/audit.log. SELinux is enabled, and errors should be logged again:
 
-     systemctl stop httpd
+     journalctl -t setroubleshoot --boot
+     less /var/log/audit/audit.log

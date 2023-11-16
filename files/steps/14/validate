@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Checking that SELinux boolean httpd_use_nfs is switched on permanently"
+if [ "$(cat /sys/fs/selinux/booleans/httpd_use_nfs)" != "1 1" ]; then
+    echo "SELinux boolean httpd_use_nfs is not permanently switched on."
+    exit 1
+fi
+
+exit 0

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Checking that file /test/b/c has SELinux type etc_t"
+if ! ls -alZ /test/b/c | grep -q ":etc_t:"; then
+    echo "File /test/a either has the wrong label or does not exist."
+    exit 1
+fi
+
+exit 0

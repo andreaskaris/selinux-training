@@ -1,26 +1,33 @@
-# Permanently changing file labels
+# Restoring default SELinux labels
 
-1. If you want to permanently change file labels, meaning that they survive beyond a relabel action, you need to use
-   the `semanage` tool. You will see that the fcontext database is quite large, with thousands of entries.
-   Go ahead and list the label database now with:
+1. Temporary changes to file labels persist across reboots. However, they to not survive an SELinux relabel.
+   Let's go ahead and tell the OS that we want to relabel the entire file system upon reboot:
 
-     semanage fcontext -l | wc -l
-     semanage fcontext -l | less
+     touch /.autorelabel
 
-2. Create file /test/b/c:
+   NOTE: You could also use command `fixfiles -F onboot` which is a wrapper around the aforementioned action.
 
-     mkdir -p /test/b
-     touch /test/b/c
+2. Reboot the system now. The system will relabel all files, so it can take a while for it to come back online.
 
-3. Let's pretend that we want to give our custom `/test` directory the same labels as `/etc`. Go ahead and search for
-   `/etc` in the fcontect database:
+     reboot
 
-     semanage fcontext -l | grep '/etc' | grep etc_t
+3. Once the system is back up, inspect directory /test. The labels should be changed back to the default:
 
-4. Now add a new entry to the database for `/test(/.*)?`. This means /test, /test/, or anything below /test/:
+     ls -alZ /test
 
-     semanage fcontext -a -t etc_t  '/test(/.*)?'
+4. It is also possible to restore file labels for specific files, or recursively for directories. First, let's
+   add the tmp_t label again:
 
-5. Use `restorecon` to relabel all files and directories under /test:
+     chcon -R -t tmp_t /test
 
-     restorecon -Rv /test
+5. Inspect the current SELinux labels:
+
+     ls -alZ /test
+
+6. Now, use the `restorecon` command to restore the default file labels:
+
+     restorecon -v -R /test
+
+7. Inspect the current SELinux labels:
+
+     ls -alZ /test

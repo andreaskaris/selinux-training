@@ -1,26 +1,27 @@
-# Disabling SELinux temporarily
+# Identifying SELinux denials
 
-1. Set SELinux into permissive mode with:
-   
-     setenforce 0
+There is a myriad of ways of identifying SELinux denials. We already saw that in RHEL 9 (although not in RHEL 8),
+you can see denials in the system journal.
 
-2. Check the current state of SELinux. It is now in permissive mode. You cannot disable SELinux from user space in
-   RHEL 9.
+Go ahead and explore some of the different ways to see why a process was denied an action by SELinux.
 
-     getenforce
-     sestatus
+1. The journal:
 
-3. Run the service again:
+     journalctl -t setroubleshoot
 
-     systemctl start cause-violation
+2. The audit log:
 
-   Observe the service's status. What is happening now?
+     grep denied /var/log/audit/audit.log
 
-     systemctl status cause-violation
+Data in the audit log does unfortunately not appear in the most human friendly format. Therefore, tools exist to
+make parsing the log easier. These tools also give recommendations for remediation actions.
 
-   Check if there are any SELinux violations in /var/log/audit/audit.log, and pay close attention to the last part
-   of each line (`permissive=0` vs `permissive=1`):
+3. ausearch:
 
-     grep -i denied /var/log/audit/audit.log
+     ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts recent
+     ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts today
 
-   You will see the same SELinux violation, but this time it is not being enforced, it is only being reported.
+4. sealert:
+
+     sealert -l "*"
+     sealert -a /var/log/audit/audit.log

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "Checking that httpd is inactive"
-if [ "$(systemctl is-active httpd)" == "active" ]; then
-    echo "httpd is still running. Please stop it."
+echo "Checking that SELinux is permanently disabled"
+if grep -q "selinux=0" /proc/cmdline; then
+    echo "SELinux is permanently disabled, but it should be enabled."
     exit 1
 fi
 

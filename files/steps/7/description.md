@@ -1,21 +1,23 @@
 # Learning about file labels
 
-An SELinux file label consists of 4 (or 5 with MCS) parts, e.g. `system_u:object_r:admin_home_t:s0`.
-These parts are:
-     user:role:type:mls_level
+All files and processes in a RHEL 9 system have an SELinux label. Many commands such as `ps`, `ls` and `id` come with
+the `-Z` parameter to list SELinux labels.
 
-You can query seinfo to list all available SELinux users, roles and types.
+1. Go ahead and inspect different directories now:
 
-1. List all available SELinux users with:
+     ls -alZ /etc/httpd
+     ls -alZ /var/www/html
 
-     seinfo -u
+2. Start httpd how:
 
-2. List all available SELinux roles with:
+     systemctl start httpd
 
-     seinfo -r
+3. List the label that the httpd process runs with. Compare that to the label of the httpd binary.
+   The file is labeled with type `httpd_exec_t`. The process runs with type label `httpd_t`.
 
-3. List all available SELinux types with:
+     ps aux -Z | grep httpd
+     ls -alZ /usr/sbin/httpd
 
-     seinfo -t
+4. We will come back to httpd a bit later. For the time being, let's stop the service again:
 
-For most use cases, you will only ever have to worry about the type label ending in `_t`.
+     systemctl stop httpd

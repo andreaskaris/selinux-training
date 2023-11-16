@@ -1,18 +1,21 @@
-# Changing file labels temporarily
+# Learning about file labels
 
-1. Create directory /test with file /test/a:
+An SELinux file label consists of 4 (or 5 with MCS) parts, e.g. `system_u:object_r:admin_home_t:s0`.
+These parts are:
+     user:role:type:mls_level
 
-     mkdir /test
-     touch /test/a
+You can query seinfo to list all available SELinux users, roles and types.
 
-2. Inspect the current SELinux labels:
+1. List all available SELinux users with:
 
-     ls -alZ /test
+     seinfo -u
 
-3. Change the SELinux type temporarily, recursively for the entire folder:
+2. List all available SELinux roles with:
 
-     chcon -R -t tmp_t /test
+     seinfo -r
 
-4. Inspect the current SELinux labels:
+3. List all available SELinux types with:
 
-     ls -alZ /test
+     seinfo -t
+
+For most use cases, you will only ever have to worry about the type label ending in `_t`.

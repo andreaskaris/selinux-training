@@ -1,3 +1,9 @@
 #!/bin/bash
 
+echo "Checking that SELinux is in enforcing mode again"
+if [ "$(getenforce)" != "Enforcing" ]; then
+    echo "SELinux is not in enforcing mode, please set it back to enforcing"
+    exit 1
+fi
+
 exit 0

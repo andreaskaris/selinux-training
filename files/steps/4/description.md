@@ -1,28 +1,16 @@
-# Disabling SELinux permanently
+# Inspecting /etc/selinux/config
 
-In order to disable SELinux permanently, you must append `selinux=0` to the kernel command line and reboot your
-system (https://access.redhat.com/solutions/3176).
-Note: Contrary to RHEL 8, in RHEL 9 it is no longer possible to set SELinux=disabled in /etc/selinux/config.
+1. Inspect file /etc/selinux/config:
 
-1. Disable SELinux permanently:
+    cat /etc/selinux/config
 
-     grubby --update-kernel ALL --args selinux=0
+You can change parameter SELINUX to `SELINUX=permissive` to set SELinux to permissive mode, permanently. This is not
+part of this exercise.
 
-2. Reboot your system:
+However, if you want to permanently disable SELinux, in RHEL 9, it is no longer possible to set SELinux=disabled in
+/etc/selinux/config. Instead, you must add an argument to the kernel command line. More on this in the next step.
 
-     reboot
+If you had to switch SELinux from targeted mode to Multi-Level Security (MLS), you would do that with variable
+SELINUXTYPE in file /etc/selinux/config. This is out of scope of this tutorial.
 
-3. Wait for your system to reboot.
-
-4. Check the SELinux status:
-
-     sestatus
-
- 5. Then, run the `cause-violation` service again:
-
-     systemctl start cause-violation
-
-6. Check the journal and /var/log/audit/audit.log. SELinux is disabled, and nothing should be logged:
-
-     journalctl -t setroubleshoot --boot
-     less /var/log/audit/audit.log
+Go ahead to the next step now with `tutorial next`.

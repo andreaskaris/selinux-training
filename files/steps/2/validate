@@ -1,9 +1,22 @@
 #!/bin/bash
-
-echo "Checking that SELinux is in enforcing mode again"
-if [ "$(getenforce)" != "Enforcing" ]; then
-    echo "SELinux is not in enforcing mode, please set it back to enforcing"
+#
+echo "Checking that SELinux is in permissive mode"
+if [ "$(getenforce)" != "Permissive" ]; then
+    echo "SELinux is not in permissive mode, please set it to permissive"
     exit 1
 fi
+
+echo "Checking that serviced cause-violation is active"
+if [ "$(systemctl is-active cause-violation)" != "active" ]; then
+    echo "Service cause-violation is not active. Have you started it?"
+    exit 1
+fi
+
+echo "Checking that an error message is logged to /var/log/audit/audit.log"
+if ! grep -q -E '^type=AVC.*denied.*permissive=1$' /var/log/audit/audit.log; then
+    echo "Could not find any AVC denied messages with permissive=1 in /var/log/audit/audit.log"
+    exit 1
+fi
+
 
 exit 0
