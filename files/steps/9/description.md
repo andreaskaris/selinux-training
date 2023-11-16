@@ -1,6 +1,6 @@
 # Restoring default SELinux labels
 
-1. Temporary changes to file labels, persist across reboots. However, they to not survive an SELinux relable.
+1. Temporary changes to file labels persist across reboots. However, they to not survive an SELinux relabel.
    Let's go ahead and tell the OS that we want to relabel the entire file system upon reboot:
 
      touch /.autorelabel
