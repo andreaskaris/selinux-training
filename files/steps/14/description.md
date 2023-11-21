@@ -1,4 +1,4 @@
-# Inspecting SELinux booleans
+# Setting SELinux permanently
 
 1. You can enable SELinux booleans persistently with 2 different commands. In order to switch on `httpd_use_nfs`
    permanently, use either of:
