@@ -1,0 +1,9 @@
+[Unit]
+Description=Daemon that opens /var/log/messages and closes it
+
+[Service]
+Type=simple
+ExecStart=/opt/tutorial/bin/open-messages
+
+[Install]
+WantedBy=multi-user.target

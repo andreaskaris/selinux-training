@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Verifying that httpd is in failed state."
+echo "Verifying that httpd is in failed state"
 if [ "$(systemctl is-failed httpd)" != "failed" ]; then
     echo "httpd is not in failed state"
     exit 1

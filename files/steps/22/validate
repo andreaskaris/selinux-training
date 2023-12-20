@@ -1,0 +1,22 @@
+#!/bin/bash
+
+TE_FILE=/root/open_messages.te
+LINES="#permissive open_messages_t;
+auth_read_passwd_file(open_messages_t)
+corecmd_exec_bin(open_messages_t)
+corecmd_mmap_bin_files(open_messages_t)
+files_manage_generic_tmp_files(open_messages_t)
+insights_client_filetrans_tmp(open_messages_t)
+logging_read_generic_logs(open_messages_t)
+sssd_read_public_files(open_messages_t)
+sssd_search_lib(open_messages_t)"
+
+while IFS= read -r l; do
+    echo "Verifying that ${TE_FILE} contains line '${l}'"
+    if ! grep -q "^${l}$" "${TE_FILE}"; then
+        echo "${TE_FILE} does not contain line '${l}'"
+        exit 1
+    fi
+done < <(printf '%s\n' "$LINES")
+
+exit 0

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Verifying that SELinux module open_messages is not loaded"
+if semodule --list-modules=full | grep -q open_messages; then
+    echo "SELinux module open_messages should not be loaded"
+    exit 1
+fi
+
+exit 0

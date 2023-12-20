@@ -13,11 +13,21 @@
           - nmap-ncat
           - python3.11
           - python3.11-pip
+          - selinux-policy-devel
+          - podman
+          - runc
+          - containernetworking-cni
+          - skopeo
+          - jq
         state: present
 
     - name: Install docopt
       ansible.builtin.command:
         cmd: pip3.11 install docopt
+
+    - name: Pull fedora-minimal
+      ansible.builtin.command:
+        cmd: podman pull {{ fedora_container_image }}
 
     - name: Copy tutorial binary
       ansible.builtin.template:
@@ -48,14 +58,62 @@
         setype: httpd_sys_content_t
         mode: '0755'
 
+    - name: Set fcontext permanently for cause-violation
+      ansible.builtin.shell: |
+        (semanage fcontext -d /opt/tutorial/bin/cause-violation 2>/dev/null || true) && \
+        semanage fcontext -a -t httpd_sys_content_t /opt/tutorial/bin/cause-violation
+
+    - name: Set /opt/tutorial/bin/open_messages to executable
+      ansible.builtin.file:
+        path: /opt/tutorial/bin/open-messages
+        state: file
+        mode: '0755'
+
     - name: Create cause-violation.service
       ansible.builtin.copy:
         src: files/services/cause-violation.service
         dest: /etc/systemd/system/cause-violation.service
 
+    - name: Create open-messages.service
+      ansible.builtin.copy:
+        src: files/services/open-messages.service
+        dest: /etc/systemd/system/open-messages.service
+
+    - name: Run fedora-minimal1 podman container
+      ansible.builtin.shell: |
+        if ! podman ps -a | grep -q fedora-minimal1; then
+            podman run -d --name fedora-minimal1 -it {{ fedora_container_image }} sleep infinity
+        fi
+
+    - name: Run fedora-minimal2 podman container
+      ansible.builtin.shell: |
+        if ! podman ps -a | grep -q fedora-minimal2; then
+            podman run -d --name fedora-minimal2 -it {{ fedora_container_image }} sleep infinity
+        fi
+
+    - name: Generate fedora-minimal1 service
+      ansible.builtin.shell: |
+        podman generate systemd --name fedora-minimal1 > /etc/systemd/system/fedora-minimal1.service
+
+    - name: Generate fedora-minimal2 service
+      ansible.builtin.shell: |
+        podman generate systemd --name fedora-minimal2 > /etc/systemd/system/fedora-minimal2.service
+
     - name: Reload systemd
       ansible.builtin.command:
         cmd: systemctl daemon-reload
+
+    - name: Enable and restart fedora-minimal1 service
+      ansible.builtin.systemd:
+        name: fedora-minimal1
+        state: started
+        enabled: true
+
+    - name: Enable and restart fedora-minimal2 service
+      ansible.builtin.systemd:
+        name: fedora-minimal2
+        state: started
+        enabled: true
 
     - name: Create /etc/motd
       ansible.builtin.template:

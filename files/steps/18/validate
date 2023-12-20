@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Verifying that httpd is in active state."
+echo "Verifying that httpd is in active state"
 if [ "$(systemctl is-active httpd)" != "active" ]; then
     echo "httpd is not in active state"
     exit 1

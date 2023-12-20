@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Verifying that open-messages service is running"
+if [ $(systemctl is-active open-messages) != "active" ]; then
+    echo "open-messages service is not active"
+    exit 1
+fi
+
+echo "Verifying that open-messages service process runs unconfined"
+if ! ps auxZ | grep [o]pen-messages | grep -q unconfined_t; then
+    echo "open-messages process is not running as unconfined_t"
+    exit 1
+fi
+
+exit 0

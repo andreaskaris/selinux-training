@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+echo "Verifying that open-messages service is running"
+if [ $(systemctl is-active open-messages) != "active" ]; then
+    echo "open-messages service is not active"
+    exit 1
+fi
+
+echo "Verifying that process open-messages runs with the correct label"
+if ! ps -fZ --pid $(pgrep -f open-messages) | grep -q open_messages_t; then
+    echo "Process open-messages should run with label open_messages_t"
+    exit 1
+fi
+
+echo "Verifying that /var/log/audit/audit.log contains no denied messages for open_messages_t"
+if grep -q denied /var/log/audit/audit.log | grep open_messages_t; then
+    echo "Found denied messages for label open_messages_t but should have found none"
+    exit 1
+fi
+
+exit 0

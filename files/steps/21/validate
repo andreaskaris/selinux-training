@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Verifying that /opt/tutorial/bin/open-messages has label open_messages_exec_t"
+if ! ls -Z /opt/tutorial/bin/open-messages | grep -q open_messages_exec_t; then
+    echo "/opt/tutorial/bin/open-messages does not have label open_messages_exec_t"
+    exit 1
+fi
+
+echo "Verifying that open-messages service is failed"
+if [ $(systemctl is-active open-messages) != "failed" ]; then
+    echo "open-messages service should be in state 'failed'"
+    exit 1
+fi
+
+exit 0

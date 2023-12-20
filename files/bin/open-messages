@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+
+import time
+import datetime
+import pathlib
+
+in_file='/var/log/messages'
+out_file='/tmp/out'
+
+pathlib.Path(out_file).unlink(missing_ok=True)
+
+while True:
+    with open(in_file) as log:
+        for line in log:
+            pass
+        line = line.rstrip()
+        now = datetime.datetime.now()
+        with open(out_file, 'a') as out: 
+            out.write(f"\033[0;32m{now}:\033[0m The last message of /var/log/messages is: '{line}'\n")
+    time.sleep(5)
