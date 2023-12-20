@@ -91,6 +91,12 @@
             podman run -d --name fedora-minimal2 -it {{ fedora_container_image }} sleep infinity
         fi
 
+    - name: Run fedora-minimal-privileged podman container
+      ansible.builtin.shell: |
+        if ! podman ps -a | grep -q fedora-minimal-privileged; then
+            podman run -d --name fedora-minimal-privileged --privileged -it {{ fedora_container_image }} sleep infinity
+        fi
+
     - name: Generate fedora-minimal1 service
       ansible.builtin.shell: |
         podman generate systemd --name fedora-minimal1 > /etc/systemd/system/fedora-minimal1.service
@@ -98,6 +104,10 @@
     - name: Generate fedora-minimal2 service
       ansible.builtin.shell: |
         podman generate systemd --name fedora-minimal2 > /etc/systemd/system/fedora-minimal2.service
+
+    - name: Generate fedora-minimal-privileged service
+      ansible.builtin.shell: |
+        podman generate systemd --name fedora-minimal-privileged > /etc/systemd/system/fedora-minimal-privileged.service
 
     - name: Reload systemd
       ansible.builtin.command:
@@ -112,6 +122,12 @@
     - name: Enable and restart fedora-minimal2 service
       ansible.builtin.systemd:
         name: fedora-minimal2
+        state: started
+        enabled: true
+
+    - name: Enable and restart fedora-minimal-privileged service
+      ansible.builtin.systemd:
+        name: fedora-minimal-privileged
         state: started
         enabled: true
 
